@@ -3,6 +3,7 @@ package slideshow
 import javafx.application.Application
 import javafx.application.Platform
 import javafx.event.EventHandler
+import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.input.KeyCode
@@ -66,7 +67,7 @@ class Presenter(val producer: (Stage) -> Slideshow) {
     }
 }
 
-class Presentation(val slideshow: Slideshow) : VBox() {
+class Presentation(val slideshow: Slideshow) : Group() {
     var index = -1
     val slides = slideshow.slides.zip(slideshow.slides.map { lazy { it.toComponent(primaryStage) } })
 

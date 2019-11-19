@@ -1,12 +1,12 @@
 package slideshow
 
 import javafx.geometry.Insets
+import javafx.scene.Group
 import javafx.scene.Node
 import javafx.scene.image.Image
 import javafx.scene.layout.*
 import javafx.scene.layout.Background
 import javafx.scene.paint.Color
-import javafx.scene.text.Font
 import javafx.stage.Stage
 
 val defaultFontFamily = "Helvetica"
@@ -41,20 +41,20 @@ data class PercentDimension(
 ) : Dimension {
     override fun getValue(slide: Slide): Double? {
         return when (dimensionType) {
-            DimensionType.WIDTH -> slide.slideshow.options.size.width.number * percent / 100.0
-            DimensionType.HEIGHT -> slide.slideshow.options.size.height.number * percent / 100.0
+            DimensionType.WIDTH -> slide.slideshow.options.size.width.number * percent
+            DimensionType.HEIGHT -> slide.slideshow.options.size.height.number * percent
         }
     }
 
     override fun getValue(component: Component): Double? {
         return when (dimensionOf) {
             DimensionOf.PARENT -> {
-                if (dimensionType == DimensionType.WIDTH) component.parent!!.getWidth()?.times(percent / 100.0)
-                else component.parent!!.getHeight()?.times(percent / 100.0)
+                if (dimensionType == DimensionType.WIDTH) component.parent!!.getWidth()?.times(percent)
+                else component.parent!!.getHeight()?.times(percent)
             }
             DimensionOf.SLIDESHOW -> {
-                if (dimensionType == DimensionType.WIDTH) component.slide!!.slideshow.options.size.width.number * percent / 100.0
-                else component.slide!!.slideshow.options.size.height.number * percent / 100.0
+                if (dimensionType == DimensionType.WIDTH) component.slide.slideshow.options.size.width.number * percent
+                else component.slide.slideshow.options.size.height.number * percent
             }
         }
     }
@@ -101,7 +101,7 @@ data class AbsoluteSize(val width: XYDimension, val height: XYDimension) : Size 
     }
 
     fun timesPercent(percent: Double) =
-        AbsoluteSize(XYDimension(width.number * percent / 100.0), XYDimension(height.number * percent / 100.0))
+        AbsoluteSize(XYDimension(width.number * percent), XYDimension(height.number * percent))
 }
 
 data class PercentSize(val width: PercentDimension, val height: PercentDimension) : Size {
@@ -111,7 +111,7 @@ data class PercentSize(val width: PercentDimension, val height: PercentDimension
                 component.parent!!.size.getWidthValue(component.parent)
             }
             DimensionOf.SLIDESHOW -> {
-                component.slide!!.slideshow.options.size.width.number
+                component.slide.slideshow.options.size.width.number
             }
         }
     }
@@ -122,7 +122,7 @@ data class PercentSize(val width: PercentDimension, val height: PercentDimension
                 component.parent!!.size.getHeightValue(component.parent)
             }
             DimensionOf.SLIDESHOW -> {
-                component.slide!!.slideshow.options.size.height.number
+                component.slide.slideshow.options.size.height.number
             }
         }
     }
@@ -167,6 +167,8 @@ data class ColorBackground(val color: Color) : slideshow.Background {
     }
 }
 
+data class Position(val xPercent: Double? = null, val yPercent: Double? = null)
+
 class Slide(
     val background: slideshow.Background? = null,
     val padding: AllSidesDimensions<out Dimension>? = null,
@@ -177,7 +179,10 @@ class Slide(
     fun withComponent(component: Slide.() -> Component) = apply { components.add(component()) }
 
     fun toComponent(stage: Stage): Node {
+        val group = Group()
         val vbox = VBox()
+        group.children.add(vbox)
+
         vbox.prefWidth = stage.width
         vbox.prefHeight = stage.height
 
@@ -189,9 +194,17 @@ class Slide(
                 padding.horizontal?.left?.getValue(this) ?: 0.0
             )
         }
-        components.forEach { vbox.children += it.getRenderableComponent() }
+        components.forEach { component ->
+            val node = component.getRenderableComponent()
+            if (component.position?.xPercent != null || component.position?.yPercent != null) {
+                group.children.add(node)
+            } else vbox.children += node
+        }
         background?.let { vbox.background = it.toJavaFxBackground() }
 
-        return vbox
+        return group
     }
+
+    fun getWidth() = slideshow.options.size.width.number
+    fun getHeight() = slideshow.options.size.height.number
 }

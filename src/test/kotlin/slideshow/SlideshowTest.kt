@@ -10,7 +10,7 @@ fun main() {
     val presenter = { stage: Stage ->
         Slideshow(
             SlideshowOptions(
-                size = getScreenSize().timesPercent(50.0)
+                size = getScreenSize().timesPercent(.5)
             )
         ).withSlide {
             Slide(
@@ -20,10 +20,15 @@ fun main() {
                 TextComponent(
                     text = "Presentation",
                     font = Fonts.TITLE.font,
-                    size = FitContent(width = PercentDimension(100.0)),
+                    size = FitContent(width = PercentDimension(1.0)),
                     alignment = Pos.CENTER,
                     margin = AllSidesDimensions(
-                        vertical = VerticalDimensions(top = PercentDimension(30.0, dimensionType = DimensionType.HEIGHT))
+                        vertical = VerticalDimensions(
+                            top = PercentDimension(
+                                .3,
+                                dimensionType = DimensionType.HEIGHT
+                            )
+                        )
                     ),
                     padding = null,
                     background = null,
@@ -34,8 +39,15 @@ fun main() {
                 TextComponent(
                     text = "Adam Ratzman",
                     font = Fonts.H2.font,
-                    size = FitContent(width = PercentDimension(100.0)),
-                    margin = AllSidesDimensions(vertical = VerticalDimensions(top = PercentDimension(2.0, dimensionType = DimensionType.WIDTH))),
+                    size = FitContent(width = PercentDimension(1.0)),
+                    margin = AllSidesDimensions(
+                        vertical = VerticalDimensions(
+                            top = PercentDimension(
+                                .02,
+                                dimensionType = DimensionType.WIDTH
+                            )
+                        )
+                    ),
                     alignment = Pos.CENTER,
                     padding = null,
                     background = null,
@@ -45,16 +57,20 @@ fun main() {
             }
         }.withSlide {
             Slide(
-                slideshow = this,
-                background = ColorBackground(Color.RED)
+                slideshow = this
             ).withComponent {
                 TextComponent(
-                    text = "Presentation",
+                    text = "Image",
                     font = Fonts.TITLE.font,
-                    size = FitContent(width = PercentDimension(100.0)),
+                    size = FitContent(width = PercentDimension(1.0)),
                     alignment = Pos.CENTER,
                     margin = AllSidesDimensions(
-                        vertical = VerticalDimensions(top = PercentDimension(30.0, dimensionType = DimensionType.HEIGHT))
+                        vertical = VerticalDimensions(
+                            top = PercentDimension(
+                                .2,
+                                dimensionType = DimensionType.HEIGHT
+                            )
+                        )
                     ),
                     padding = null,
                     background = null,
@@ -62,15 +78,10 @@ fun main() {
                     slide = this
                 )
             }.withComponent {
-                TextComponent(
-                    text = "Adam Ratzman",
-                    font = Fonts.H2.font,
-                    size = FitContent(width = PercentDimension(100.0)),
-                    margin = AllSidesDimensions(vertical = VerticalDimensions(top = PercentDimension(2.0, dimensionType = DimensionType.WIDTH))),
-                    alignment = Pos.CENTER,
-                    padding = null,
-                    background = null,
-                    parent = null,
+                ImageComponent(
+                    url = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png",
+                    sizeMultiplier = .5,
+                    position = Position(.7, .7),
                     slide = this
                 )
             }
@@ -78,7 +89,4 @@ fun main() {
     }.createPresenter()
 
     val scene = presenter.scene
-    val label = (((scene.focusOwner) as VBox).children[0] as VBox).children[0] as Label
-    println(label.width)
-    println(label.textAlignment)
 }
